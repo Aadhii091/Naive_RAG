@@ -1,7 +1,7 @@
 import os
 from langchain_community.document_loaders import TextLoader, DirectoryLoader
 from langchain_text_splitters import CharacterTextSplitter
-from langchain_ollama import OllamaEmbeddings, OllamaLLM
+from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 
 def load_documents(docs_path="data"):
@@ -33,5 +33,32 @@ def load_documents(docs_path="data"):
     return documents
 
 
+def split_documents(documents, chunk_size=1000, chunk_overlap=100):
+
+    print('splitting the document into chunks...')
+
+    text_splitter = CharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap
+    )
+
+    chunks = text_splitter.split_documents(documents)
+
+    if chunks:
+
+        for i, chunk in enumerate(chunks[:5]):
+            print(f"\n--- Chunk {i+1} ---")
+            print(f"Source: {chunk.metadata['source']}")
+            print(f"Length: {len(chunk.page_content)} characters")
+            print(f"Content:")
+            print(chunk.page_content)
+            print("-" * 50)
+        
+        if len(chunks)>5:
+            print(f'\n... and {len(chunks)-5} more chunks')
+
+        return
+
+
 documents = load_documents()
-print(documents)
+chunks = split_documents(documents)
