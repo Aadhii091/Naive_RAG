@@ -3,7 +3,7 @@ from langchain_ollama import OllamaEmbeddings
 
 persist_directory = "db/chroma_db"
 
-embedding_model = OllamaEmbeddings(model='nomic-embed-text')
+embedding_model = OllamaEmbeddings(model='embeddinggemma:300m')
 
 db = Chroma(
     persist_directory=persist_directory,
