@@ -1,5 +1,5 @@
 from langchain_experimental.text_splitter import SemanticChunker
-from langchain_ollama import OllamaEmbeddings
+from langchain_ollama import OllamaEmbeddings, OllamaLLM
 
 tesla_text = """Tesla's Q3 Results
 Tesla reported record revenue of $25.2B in Q3 2024.
@@ -16,20 +16,81 @@ Supply chain issues caused a 12% increase in production costs.
 Tesla is working to diversify its supplier base.
 New manufacturing techniques are being implemented to reduce costs."""
 
-model = OllamaEmbeddings(model="embeddinggemma:300m")
+embedding_model = OllamaEmbeddings(model="embeddinggemma:300m")
+llm = OllamaLLM(model="gemma3:12b", temperature=0)
 
 # Sematic chunking
-semantic_splitter = SemanticChunker(
-    embeddings=model,
-    breakpoint_threshold_type="percentile",
-    breakpoint_threshold_amount=70
-)
+def semantic_chunking():
 
-chunks = semantic_splitter.split_text(tesla_text)
+    semantic_splitter = SemanticChunker(
+        embeddings=embedding_model,
+        breakpoint_threshold_type="percentile",
+        breakpoint_threshold_amount=70
+    )
 
-print("SEMANTIC CHUNKING RESULTS:")
-print("=" * 50)
-for i, chunk in enumerate(chunks, 1):
-    print(f"Chunk {i}: ({len(chunk)} chars)")
-    print(f'"{chunk}"')
-    print()
+    chunks = semantic_splitter.split_text(tesla_text)
+
+    print("SEMANTIC CHUNKING RESULTS:")
+    print("=" * 50)
+    for i, chunk in enumerate(chunks, 1):
+        print(f"Chunk {i}: ({len(chunk)} chars)")
+        print(f'"{chunk}"')
+        print()
+
+
+# Create the prompt
+def agentic_chunking():
+    prompt = f"""
+    You are a text chunking expert. Split this text into logical chunks.
+
+    Rules:
+    - Each chunk should be around 200 characters or less
+    - Split at natural topic boundaries
+    - Keep related information together
+    - Put "<<<SPLIT>>>" between chunks
+
+    Text:
+    {tesla_text}
+
+    Return the text with <<<SPLIT>>> markers where you want to split:
+    """
+
+    # Get AI response
+    print("🤖 Asking AI to chunk the text...")
+    response = llm.invoke(prompt)
+    marked_text = response
+
+    # Split the text at the markers
+    chunks = marked_text.split("<<<SPLIT>>>")
+
+    # Clean up the chunks (remove extra whitespace)
+    clean_chunks = []
+    for chunk in chunks:
+        cleaned = chunk.strip()
+        if cleaned:  # Only keep non-empty chunks
+            clean_chunks.append(cleaned)
+
+    # Show results
+    print("\n🎯 AGENTIC CHUNKING RESULTS:")
+    print("=" * 50)
+
+    for i, chunk in enumerate(clean_chunks, 1):
+        print(f"Chunk {i}: ({len(chunk)} chars)")
+        print(f'"{chunk}"')
+        print()
+
+def main():
+    while True:
+        user = input("Enter your choice of chunking strategy: (eg: semantic and agentic), quit for exit : ")
+
+        if user.lower() == "quit":
+            break
+        elif user.lower() == "semantic":
+            semantic_chunking()
+        elif user.lower() == "agentic":
+            agentic_chunking()
+        else:
+            print("Invalid input")
+
+if __name__ == "__main__":
+    main()
