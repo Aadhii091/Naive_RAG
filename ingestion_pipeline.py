@@ -33,7 +33,7 @@ def load_documents(docs_path="data"):
     return documents
 
 
-def split_documents(documents, chunk_size=1000, chunk_overlap=100):
+def split_documents(documents, chunk_size=500, chunk_overlap=50):
 
     print('splitting the document into chunks...')
 
@@ -41,21 +41,28 @@ def split_documents(documents, chunk_size=1000, chunk_overlap=100):
         encoding_name="cl100k_base",
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
-        separators=["\n\n", "\n", ". ", " ", ""]
+        separators = [
+        "\n## ",      # headings
+        "\n\n",       # paragraphs
+        "\n",         # lines
+        ". ",         # sentences
+        " ",          # words
+        ""
+        ]
     )
 
     chunks = text_splitter.split_documents(documents)
 
     if chunks:
 
-        for i, chunk in enumerate(chunks[:5]):
+        for i, chunk in enumerate(chunks[:10]):
             print(f"\n--- Chunk {i+1} ---")
             print(f"Source: {chunk.metadata['source']}")
             print(f"Length: {len(chunk.page_content)} characters")
             print(f"Content:")
             print(chunk.page_content)
             print("-" * 50)
-        
+            
         if len(chunks)>5:
             print(f'\n... and {len(chunks)-5} more chunks')
 
@@ -65,7 +72,7 @@ def create_vector_db(chunks, persist_directory="db/chroma_db"):
 
     print("Creating embeddings and storing in ChromaDB...")
 
-    embedding_model = OllamaEmbeddings(model='nomic-embed-text')
+    embedding_model = OllamaEmbeddings(model='embeddinggemma:300m')
 
     # create chromadb vector store
     print("--- Creating vector store ---")
