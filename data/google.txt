@@ -1,7 +1,5 @@
 Google
 
-
-
 ''For the number, see Googol''
 Google LLC is an American multinational technology company that specializes in internet-based services and products, including its search engine, video streaming platform YouTube, online advertising platforms, cloud computing, the Android mobile operating system, hardware, and artificial intelligence technologies. Founded in 1998 by Larry Page and Sergey Brin as a Stanford University project employing the PageRank algorithm to index and rank web pages, the company expanded into a broad digital ecosystem and was restructured in 2015 as a subsidiary of Alphabet Inc., with headquarters in Mountain View, California, and CEO Sundar Pichai since that year.[1]
 Google's search engine handles billions of queries daily, capturing approximately 92% of global searches and generating most revenue from data-driven advertising auctions. Its portfolio encompasses the Chrome browser, YouTube, Google Cloud, Pixel smartphones, and Nest devices, alongside advancements in machine learning, mapping, translation, and autonomous driving through Waymo.

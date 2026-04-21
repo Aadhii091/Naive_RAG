@@ -1,7 +1,5 @@
 NVIDIA
 
-
-
 NVIDIA Corporation is an American multinational technology company founded in April 1993 by Jensen Huang, Chris Malachowsky, and Curtis Priem, and headquartered in Santa Clara, California.[1][2] The company is renowned for inventing the graphics processing unit (GPU) in 1999 with the release of the GeForce 256, which revolutionized computer graphics and laid the foundation for advancements in gaming, professional visualization, and parallel computing.[1][3] Over the decades, NVIDIA has expanded beyond graphics into leadership positions in artificial intelligence (AI) hardware, particularly through its CUDA software platform and Tensor Core technology, enabling breakthroughs in deep learning and machine learning applications.[1][4] It dominates the gaming graphics market with its GeForce series of GPUs and provides data center solutions, including high-performance computing systems for AI training, scientific simulations, and cloud infrastructure, powering major tech giants and research institutions worldwide.[2][5] These innovations, coupled with surging demand for AI technologies in the 2020s, have propelled NVIDIA to become one of the world's most valuable companies by market capitalization, reaching approximately $4.45 trillion as of March 6, 2026.[6]
 History
 
