@@ -11,15 +11,25 @@ db = Chroma(
     collection_metadata={"hnsw:space": "cosine"}
 )
 
+# def retriever_func(query):
+#     retriever = db.as_retriever(
+#         search_type="similarity_score_threshold",
+#         search_kwargs={
+#             "k": 5,
+#             "score_threshold": 0.3
+#         }
+#     )
+
 def retriever_func(query):
     retriever = db.as_retriever(
-        search_type="similarity_score_threshold",
-        search_kwargs={
+        search_type="mmr",
+        search_kwargs = {
             "k": 5,
-            "score_threshold": 0.3
+            "fetch_k": 16,
+            "lambda_mult": 0.5 
         }
     )
-
+    
     relevant_docs = retriever.invoke(query)
 
     print(f"User Query: {query}")
