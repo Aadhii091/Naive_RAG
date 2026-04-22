@@ -1,5 +1,6 @@
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
+from ingestion_pipeline import load_documents
 
 tesla_text = """Tesla's Q3 Results
 Tesla reported record revenue of $25.2B in Q3 2024.
@@ -19,6 +20,8 @@ New manufacturing techniques are being implemented to reduce costs."""
 embedding_model = OllamaEmbeddings(model="embeddinggemma:300m")
 llm = OllamaLLM(model="gemma3:12b", temperature=0)
 
+documents = load_documents()
+
 # Sematic chunking
 def semantic_chunking():
 
@@ -28,13 +31,13 @@ def semantic_chunking():
         breakpoint_threshold_amount=70
     )
 
-    chunks = semantic_splitter.split_text(tesla_text)
+    chunks = semantic_splitter.split_documents(documents)
 
     print("SEMANTIC CHUNKING RESULTS:")
     print("=" * 50)
     for i, chunk in enumerate(chunks, 1):
-        print(f"Chunk {i}: ({len(chunk)} chars)")
-        print(f'"{chunk}"')
+        print(f"Chunk {i}: ({len(chunk.page_content)} chars)")
+        print(f'"{chunk.page_content}"')
         print()
 
 
@@ -50,7 +53,7 @@ def agentic_chunking():
     - Put "<<<SPLIT>>>" between chunks
 
     Text:
-    {tesla_text}
+    {documents}
 
     Return the text with <<<SPLIT>>> markers where you want to split:
     """
