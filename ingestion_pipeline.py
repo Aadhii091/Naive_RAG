@@ -53,20 +53,21 @@ def split_documents(documents, chunk_size=500, chunk_overlap=50):
 
     chunks = text_splitter.split_documents(documents)
 
-    if chunks:
+    return chunks
 
-        for i, chunk in enumerate(chunks[:10]):
-            print(f"\n--- Chunk {i+1} ---")
-            print(f"Source: {chunk.metadata['source']}")
-            print(f"Length: {len(chunk.page_content)} characters")
-            print(f"Content:")
-            print(chunk.page_content)
-            print("-" * 50)
+    # if chunks:
+
+    #     for i, chunk in enumerate(chunks[:10]):
+    #         print(f"\n--- Chunk {i+1} ---")
+    #         print(f"Source: {chunk.metadata['source']}")
+    #         print(f"Length: {len(chunk.page_content)} characters")
+    #         print(f"Content:")
+    #         print(chunk.page_content)
+    #         print("-" * 50)
             
-        if len(chunks)>5:
-            print(f'\n... and {len(chunks)-5} more chunks')
+    #     if len(chunks)>5:
+    #         print(f'\n... and {len(chunks)-5} more chunks')
 
-        return chunks
     
 def create_vector_db(chunks, persist_directory="db/chroma_db"):
 
@@ -99,7 +100,7 @@ def main():
     if os.path.exists(persistent_directory):
         print("✅ Vector store already exists. No need to re-process documents.")
         
-        embedding_model = OllamaEmbeddings(model="nomic-embed-text")
+        embedding_model = OllamaEmbeddings(model="embeddinggemma:300m")
         vectorstore = Chroma(
             persist_directory=persistent_directory,
             embedding_function=embedding_model, 
