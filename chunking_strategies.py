@@ -18,12 +18,12 @@ Tesla is working to diversify its supplier base.
 New manufacturing techniques are being implemented to reduce costs."""
 
 embedding_model = OllamaEmbeddings(model="embeddinggemma:300m")
-llm = OllamaLLM(model="gemma3:12b", temperature=0)
+llm = OllamaLLM(model="gemma3:4b", temperature=0)
 
 documents = load_documents()
 
 # Sematic chunking
-def semantic_chunking():
+def semantic_chunking(documents=None):
 
     semantic_splitter = SemanticChunker(
         embeddings=embedding_model,
@@ -40,6 +40,7 @@ def semantic_chunking():
         print(f'"{chunk.page_content}"')
         print()
 
+    return chunks
 
 # Create the prompt
 def agentic_chunking():
