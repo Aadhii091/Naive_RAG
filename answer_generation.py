@@ -3,10 +3,10 @@ from langchain_ollama import OllamaLLM
 from retreival_pipeline import retriever_func
 
 
-chat_history = []
-model = OllamaLLM(model='gemma3:12b')
+# chat_history = []
+model = OllamaLLM(model='gemma3:4b')
 
-def ask_question(user_question):
+def ask_question(user_question, chat_history, vector_db):
     print(f"\n--- You asked: {user_question} ---")
 
     if chat_history:
@@ -22,7 +22,7 @@ def ask_question(user_question):
     else:
         search_question = user_question
 
-    relevant_docs = retriever_func(search_question)
+    relevant_docs = retriever_func(search_question, vector_db)
 
     combined_input = f"""Based on the following documents, please answer this question: {search_question}
 
@@ -46,6 +46,8 @@ def ask_question(user_question):
     chat_history.append(AIMessage(content=result))
 
     print(result)
+
+    return result
 
 def start_chat():
     print("Ask me questions! Type 'quit' to exit.")
