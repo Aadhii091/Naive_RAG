@@ -20,7 +20,7 @@ db = Chroma(
 #         }
 #     )
 
-def retriever_func(query):
+def retriever_func(query, db):
     retriever = db.as_retriever(
         search_type="mmr",
         search_kwargs = {
@@ -29,7 +29,7 @@ def retriever_func(query):
             "lambda_mult": 0.5 
         }
     )
-    
+
     relevant_docs = retriever.invoke(query)
 
     print(f"User Query: {query}")
