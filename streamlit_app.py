@@ -1,4 +1,9 @@
+import fitz
 import streamlit as st
+from ingestion_pipeline import create_vector_db
+from answer_generation import ask_question
+from chunking_strategies import semantic_chunking
+from langchain_core.documents import Document
 
 # ---- PAGE CONFIG ----
 st.set_page_config(page_title="RAG Chat", page_icon="🧠", layout="wide")
@@ -21,10 +26,43 @@ with st.sidebar:
         type=["pdf"]
     )
 
+    def parse_pdf(uploaded_file):
+        """
+        Input: Streamlit uploaded PDF file
+        Output: List of text chunks with metadata
+        """
+
+        # ---- READ PDF ----
+        pdf_bytes = uploaded_file.read()
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+
+        raw_docs = []
+
+        for page_num, page in enumerate(doc):
+            text = page.get_text("text")
+
+            # Skip empty pages
+            if not text.strip():
+                continue
+
+            raw_docs.append(
+                Document(
+                page_content=text,
+                metadata={
+                    "page": page_num + 1,
+                    "source": uploaded_file.name
+                    }
+                )
+            )
+
+            chunks = semantic_chunking(raw_docs)
+
+        return chunks
+    
     if uploaded_file is not None:
         with st.spinner("Processing PDF..."):
             text_chunks = parse_pdf(uploaded_file)   
-            vectorstore = create_vectorstore(text_chunks)  
+            vectorstore = create_vector_db(text_chunks, "db/chroma_db1")  
 
             st.session_state.vectorstore = vectorstore
             st.success("Document processed!")
@@ -50,11 +88,11 @@ if user_query:
 
         # Generate response
         with st.spinner("Thinking..."):
-            response = rag_query(
-                query=user_query,
-                chat_history=st.session_state.chat_history,
-                vectorstore=st.session_state.vectorstore
-            )
+            response = ask_question(
+                user_query, 
+                st.session_state.chat_history,
+                st.session_state.vectorstore
+                )
 
         # Display assistant response
         st.chat_message("assistant").markdown(response)
