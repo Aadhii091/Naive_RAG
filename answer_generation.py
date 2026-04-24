@@ -4,7 +4,7 @@ from retreival_pipeline import retriever_func
 
 
 # chat_history = []
-model = OllamaLLM(model='gemma3:4b')
+llm = OllamaLLM(model='gemma3:4b')
 
 def ask_question(user_question, chat_history, vector_db):
     print(f"\n--- You asked: {user_question} ---")
@@ -16,7 +16,7 @@ def ask_question(user_question, chat_history, vector_db):
             HumanMessage(content=f"New question: {user_question}")
         ]
 
-        result = model.invoke(messages)
+        result = llm.invoke(messages)
         search_question = result.strip()
         print(f"Searching for: {search_question}")
     else:
@@ -27,20 +27,18 @@ def ask_question(user_question, chat_history, vector_db):
     combined_input = f"""Based on the following documents, please answer this question: {search_question}
 
     Documents:
-    {chr(10).join([f" Document {i} : {doc.metadata}, - {doc.page_content}" for i, doc in enumerate(relevant_docs, 1)])}
+    {chr(10).join([f" Document {i} : {doc.metadata.get("page", "?")}, - {doc.page_content}" for i, doc in enumerate(relevant_docs, 1)])}
     Please provide a clear, precise answer and you are constrained to answer exactly what was asked using only the information from these documents. If you can't find the answer in the documents, say "I don't have enough information to answer that question based on the provided documents."
     you are constrained to answer in this structure : 
-    Query : the query user had asked.
     Answer : answer of you. 
-    Document No : no of the document you are preferring.
-    source : the document id you prefer for answering.                
+    source : the document page you prefer for answering.                
     """
 
     messages = [
             SystemMessage(content='You are a helpful assistant'),
             HumanMessage(content=combined_input)     ]
 
-    result = model.invoke(messages)
+    result = llm.invoke(messages)
 
     chat_history.append(HumanMessage(content=user_question))
     chat_history.append(AIMessage(content=result))
