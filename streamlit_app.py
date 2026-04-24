@@ -40,7 +40,7 @@ with st.sidebar:
 
         raw_docs = []
 
-        for page_num, page in enumerate(doc):
+        for page_num, page in enumerate(doc, 1):
             text = page.get_text("text")
 
             # Skip empty pages
@@ -51,7 +51,7 @@ with st.sidebar:
                 Document(
                 page_content=text,
                 metadata={
-                    "page": page_num + 1,
+                    "page": page_num,
                     "source": uploaded_file.name
                     }
                 )
@@ -64,18 +64,25 @@ with st.sidebar:
     if uploaded_file is not None and st.session_state.vectorstore is None:
         with st.spinner("Processing PDF..."):
             text_chunks = parse_pdf(uploaded_file)
-            vectorstore = create_vector_db(text_chunks, "db/chroma_db1")
+            vectorstore = create_vector_db(text_chunks, f"db/{uploaded_file.name}")
 
             st.session_state.vectorstore = vectorstore
             st.success("Document processed!")
+    else:
+        st.success("Document processed!")
 
 # ---- MAIN CHAT UI ----
 st.subheader("💬 Chat")
 
 # Display chat history
-for role, message in st.session_state.chat_history:
-    with st.chat_message(role):
-        st.markdown(message)
+for msg in st.session_state.chat_history:
+    if isinstance(msg, HumanMessage):
+        with st.chat_message("user"):
+            st.markdown(msg.content)
+
+    elif isinstance(msg, AIMessage):
+        with st.chat_message("assistant"):
+            st.markdown(msg.content)
 
 # ---- USER INPUT ----
 user_query = st.chat_input("Ask something about the document...")
@@ -97,5 +104,3 @@ if user_query:
 
         # Display assistant response
         st.chat_message("assistant").markdown(response)
-        st.session_state.chat_history.append(HumanMessage(content=user_query))
-        st.session_state.chat_history.append(AIMessage(content=response))
