@@ -10,9 +10,10 @@ def ask_question(user_question, chat_history, vector_db):
     print(f"\n--- You asked: {user_question} ---")
 
     if chat_history:
+        history_copy = chat_history.copy()
         messages = [
             SystemMessage(content="Given the chat history, rewrite the new question to be standalone and searchable. Just return the rewritten question."),
-        ] + chat_history + [
+        ] + history_copy + [
             HumanMessage(content=f"New question: {user_question}")
         ]
 
@@ -24,14 +25,39 @@ def ask_question(user_question, chat_history, vector_db):
 
     relevant_docs = retriever_func(search_question, vector_db)
 
-    combined_input = f"""Based on the following documents, please answer this question: {search_question}
+    combined_input = f"""
+    You are a retrieval-based QA assistant. Your task is to answer the user's question strictly using the provided documents.
 
-    Documents:
-    {chr(10).join([f" Document {i} : {doc.metadata.get("page", "?")}, - {doc.page_content}" for i, doc in enumerate(relevant_docs, 1)])}
-    Please provide a clear, precise answer and you are constrained to answer exactly what was asked using only the information from these documents. If you can't find the answer in the documents, say "I don't have enough information to answer that question based on the provided documents."
-    you are constrained to answer in this structure : 
-    Answer : answer of you. 
-    source : the document page you prefer for answering.                
+    ---------------------
+    USER QUESTION:
+    {search_question}
+    ---------------------
+
+    DOCUMENTS:
+    {chr(10).join([f"[Page {doc.metadata.get('page', '?')}] {doc.page_content}" for doc in relevant_docs])}
+    ---------------------
+
+    INSTRUCTIONS:
+
+    1. ONLY use information from the provided documents.
+    2. DO NOT use prior knowledge.
+    3. If the answer is not explicitly present, respond:
+    "I don't have enough information to answer that question based on the provided documents."
+    4. Keep the answer concise, precise, and directly relevant to the question.
+    5. Do NOT include irrelevant details.
+
+    CITATION RULES:
+
+    - You MUST cite the page number(s) used.
+    - If multiple pages are used, list them.
+
+    OUTPUT FORMAT (strictly follow):
+
+    Answer:
+    <your answer here>
+
+    Source:
+    <Page number(s)>
     """
 
     messages = [
@@ -44,7 +70,6 @@ def ask_question(user_question, chat_history, vector_db):
     chat_history.append(AIMessage(content=result))
 
     print(result)
-
     return result
 
 def start_chat():
