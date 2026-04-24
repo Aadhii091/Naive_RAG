@@ -4,6 +4,8 @@ from ingestion_pipeline import create_vector_db
 from answer_generation import ask_question
 from chunking_strategies import semantic_chunking
 from langchain_core.documents import Document
+from langchain_core.messages import HumanMessage, AIMessage
+
 
 # ---- PAGE CONFIG ----
 st.set_page_config(page_title="RAG Chat", page_icon="🧠", layout="wide")
@@ -55,14 +57,14 @@ with st.sidebar:
                 )
             )
 
-            chunks = semantic_chunking(raw_docs)
+        chunks = semantic_chunking(raw_docs)
 
         return chunks
     
-    if uploaded_file is not None:
+    if uploaded_file is not None and st.session_state.vectorstore is None:
         with st.spinner("Processing PDF..."):
-            text_chunks = parse_pdf(uploaded_file)   
-            vectorstore = create_vector_db(text_chunks, "db/chroma_db1")  
+            text_chunks = parse_pdf(uploaded_file)
+            vectorstore = create_vector_db(text_chunks, "db/chroma_db1")
 
             st.session_state.vectorstore = vectorstore
             st.success("Document processed!")
@@ -84,7 +86,6 @@ if user_query:
     else:
         # Display user message
         st.chat_message("user").markdown(user_query)
-        st.session_state.chat_history.append(("user", user_query))
 
         # Generate response
         with st.spinner("Thinking..."):
@@ -96,4 +97,5 @@ if user_query:
 
         # Display assistant response
         st.chat_message("assistant").markdown(response)
-        st.session_state.chat_history.append(("assistant", response))
+        st.session_state.chat_history.append(HumanMessage(content=user_query))
+        st.session_state.chat_history.append(AIMessage(content=response))
