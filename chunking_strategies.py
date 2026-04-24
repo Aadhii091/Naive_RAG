@@ -20,8 +20,6 @@ New manufacturing techniques are being implemented to reduce costs."""
 embedding_model = OllamaEmbeddings(model="embeddinggemma:300m")
 llm = OllamaLLM(model="gemma3:4b", temperature=0)
 
-documents = load_documents()
-
 # Sematic chunking
 def semantic_chunking(documents=None):
 
@@ -98,3 +96,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    documents = load_documents()
