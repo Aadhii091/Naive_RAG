@@ -115,7 +115,7 @@ This project focuses on:
 ### Setup
 
 ```
-git clone <repo-url>
+git clone "https://github.com/Aadhii091/Naive_RAG.git"
 cd project
 
 python -m venv venv
